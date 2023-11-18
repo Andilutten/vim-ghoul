@@ -3,8 +3,8 @@ if exists('g:loaded_gh')
 endif
 let g:loaded_gh = 1
 
-command! -bar -bang -nargs=* -complete=custom,gh#complete_command Gh
-			\ execute gh#exec_command(<q-args>)
+command! -nargs=* -complete=custom,gh#complete_command Gh
+			\ execute gh#exec_command(<q-args>, <q-mods>)
 
 function! s:dot(cmd) abort
 	try
