@@ -1,0 +1,22 @@
+{
+	"autoload/*.vim": {
+		"type": "autoload",
+		"alternate": "plugin/{}.vim"
+	},
+	"plugin/*.vim": {
+		"type": "plugin",
+		"alternate": "autoload/{}.vim"
+	},
+	"syntax/*.vim": {
+		"type": "syntax",
+		"template": [
+			"if exists(\"b:current_syntax\")",
+			"	finish",
+			"endif",
+			"",
+			"syn sync fromstart",
+			"",
+			"let b:current_syntax = \"{}\""
+		]
+	}
+}
