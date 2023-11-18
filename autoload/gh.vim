@@ -28,9 +28,13 @@ function! gh#buf_create(cmd, mods) abort
 	execute printf("setl ft=%s", a:cmd["ft"])
 endfunction
 
+function! gh#call(args) abort
+	return systemlist(printf("%s %s", g:ghoul_gh_path, a:args))
+endfunction
+
 function! gh#exec_pr_list(args, mods) abort
 	let cmd = s:commands["pr"]["list"]
-	let output = json_decode(system("gh " . a:args . " --json number,title,headRefName,state,updatedAt"))
+	let output = json_decode(join(gh#call(a:args .. " --json number,title,headRefName,state,updatedAt"), "\n"))
 	call gh#buf_create(cmd, a:mods)
 	let index = 0
 	for item in output
@@ -42,12 +46,12 @@ endfunction
 
 function! gh#exec_pr_diff(args, mods) abort
 	let cmd = s:commands["pr"]["diff"]
-	let id = matchstr(a:args, '\v\d+$')
+	let id = matchstr(a:args, '\d\+$')
 	if empty(id)
 		echoerr "Misformed command"
 		return ''
 	endif
-	let output = systemlist("gh " . a:args)
+	let output = gh#call(a:args)
 	call gh#buf_create(cmd, a:mods)
 	execute "setl syntax=diff"
 	call append(0, output)
@@ -61,13 +65,16 @@ function! gh#exec_pr_view(args, mods) abort
 		echoerr "Misformed command"
 		return ''
 	endif
-	let output = systemlist("gh " . a:args)
+	let output = gh#call(a:args)
 	call gh#buf_create(cmd, a:mods)
 	call append(0, output)
 	return ''
 endfunction
 
 function! gh#exec_command(args, mods) abort
+	if !executable(g:ghoul_gh_path)
+		echoerr "gh executable not found"
+	endif
 	let parts = matchlist(a:args,  '^\(\S\+\)\s\+\(\S\+\)')
 	if empty(parts)
 		echoerr "Unknown command"

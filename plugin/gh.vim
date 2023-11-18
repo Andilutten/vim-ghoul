@@ -3,6 +3,8 @@ if exists('g:loaded_gh')
 endif
 let g:loaded_gh = 1
 
+let g:ghoul_gh_path = get(g:, "ghoul_gh_path", "gh")
+
 command! -nargs=* -complete=custom,gh#complete_command Gh
 			\ execute gh#exec_command(<q-args>, <q-mods>)
 
