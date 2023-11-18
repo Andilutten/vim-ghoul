@@ -40,6 +40,21 @@ function! gh#exec_pr_list(args) abort
 	return ''
 endfunction
 
+function! gh#exec_pr_diff(args) abort
+	let cmd = s:commands["pr"]["diff"]
+	let id = matchstr(a:args, '\v\d+$')
+	if empty(id)
+		echoerr "Misformed command"
+		return ''
+	endif
+	let output = systemlist("gh " . a:args)
+	execute "tabnew"
+	execute printf("setl ft=%s", cmd["ft"])
+	execute "setl syntax=diff"
+	call append(0, output)
+	return ''
+endfunction
+
 function! gh#exec_pr_view(args) abort
 	let cmd = s:commands["pr"]["view"]
 	let id = matchstr(a:args, '\v\d+$')

@@ -24,9 +24,9 @@ endfunction
 
 augroup gh
 	autocmd!
-	autocmd FileType ghprlist,ghissuelist,ghpr,ghissue setl norelativenumber nonumber 
+	autocmd FileType ghprlist,ghissuelist,ghpr,ghissue,ghprdiff setl norelativenumber nonumber 
 				\ cursorline bufhidden=delete buftype=nofile nobuflisted
-	autocmd FileType ghprlist,ghissuelist,ghpr,ghissue nnoremap <buffer> <silent> q  <cmd>bd!<cr>
+	autocmd FileType ghprlist,ghissuelist,ghpr,ghissue,ghprdiff nnoremap <buffer> <silent> q  <cmd>bd!<cr>
 	autocmd FileType ghprlist nnoremap <buffer> <expr> . <sid>dot('pr')
 	autocmd FileType ghprlist nnoremap <buffer> <silent> <expr> <cr> <sid>pr_exec('view')
 	autocmd FileType ghprlist nnoremap <buffer> <silent> <expr> D <sid>pr_exec('diff')
