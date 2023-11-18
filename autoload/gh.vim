@@ -23,15 +23,15 @@ let s:commands = {
 			\	}
 			\}
 
-function! gh#exec_pr_diff(args) abort
-	throw "not implemented"
+function! gh#buf_create(cmd, mods) abort
+	execute a:mods .. " split | enew"
+	execute printf("setl ft=%s", a:cmd["ft"])
 endfunction
 
-function! gh#exec_pr_list(args) abort
+function! gh#exec_pr_list(args, mods) abort
 	let cmd = s:commands["pr"]["list"]
 	let output = json_decode(system("gh " . a:args . " --json number,title,headRefName,state,updatedAt"))
-	execute "split | enew"
-	execute printf("setl ft=%s", cmd["ft"])
+	call gh#buf_create(cmd, a:mods)
 	let index = 0
 	for item in output
 		call append(index, printf("#%s\t%s\t@%s\t%s\t%s", item['number'], item['title'], item['headRefName'], item['state'], item['updatedAt']))
@@ -40,7 +40,7 @@ function! gh#exec_pr_list(args) abort
 	return ''
 endfunction
 
-function! gh#exec_pr_diff(args) abort
+function! gh#exec_pr_diff(args, mods) abort
 	let cmd = s:commands["pr"]["diff"]
 	let id = matchstr(a:args, '\v\d+$')
 	if empty(id)
@@ -48,14 +48,13 @@ function! gh#exec_pr_diff(args) abort
 		return ''
 	endif
 	let output = systemlist("gh " . a:args)
-	execute "tabnew"
-	execute printf("setl ft=%s", cmd["ft"])
+	call gh#buf_create(cmd, a:mods)
 	execute "setl syntax=diff"
 	call append(0, output)
 	return ''
 endfunction
 
-function! gh#exec_pr_view(args) abort
+function! gh#exec_pr_view(args, mods) abort
 	let cmd = s:commands["pr"]["view"]
 	let id = matchstr(a:args, '\v\d+$')
 	if empty(id)
@@ -63,13 +62,12 @@ function! gh#exec_pr_view(args) abort
 		return ''
 	endif
 	let output = systemlist("gh " . a:args)
-	execute "split | enew"
-	execute printf("setl ft=%s", cmd["ft"])
+	call gh#buf_create(cmd, a:mods)
 	call append(0, output)
 	return ''
 endfunction
 
-function! gh#exec_command(args) abort
+function! gh#exec_command(args, mods) abort
 	let parts = matchlist(a:args,  '^\(\S\+\)\s\+\(\S\+\)')
 	if empty(parts)
 		echoerr "Unknown command"
@@ -88,7 +86,7 @@ function! gh#exec_command(args) abort
 		return ''
 	endif
 
-	let FuncRef = function(s:commands[cmd][subcmd]["handler"], [a:args])	
+	let FuncRef = function(s:commands[cmd][subcmd]["handler"], [a:args, a:mods])	
 	call FuncRef()
 	execute "norm! Gddgg$"
 	setl nomodifiable
